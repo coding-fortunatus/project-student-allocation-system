@@ -1,4 +1,5 @@
-<?php 
+<?php
+    require_once 'PhpXlsxGenerator.php';
 
     function validate_input($data) {
         stripslashes($data);
@@ -103,4 +104,27 @@
         }
         
     }
-?>
+    function download_Allocation($programme, $allocationtable, $lecturertable) {
+        global $conn;
+
+        // Setting filename
+        $filename = $programme.'-Allocation.xlsx';
+
+        // Define column names 
+        $excelData[] = array('LECTURER CODE', 'LECTURER NAME', 'LECTURER STATUS', 'ALLOCATED STUDENTS', 'PROGRAMME'); 
+
+        // Fetch All data from table
+        // $sql = "SELECT * FROM $table";
+        $result = getAllocations($allocationtable, $lecturertable);
+        if($result->num_rows > 0){ 
+            while($row = $result->fetch_assoc()){  
+                $lineData = array($row['lecturer_code'], $row['lecturer_name'], $row['lec_status'], $row['students'], $row['programme']);  
+                $excelData[] = $lineData; 
+            } 
+        }
+        
+        // Export data to excel and download as xlsx file 
+        $xlsx = CodexWorld\PhpXlsxGenerator::fromArray( $excelData ); 
+        $xlsx->downloadAs($filename);
+        exit;
+    }
