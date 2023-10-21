@@ -8,6 +8,7 @@ $lecturerArray = $studentsArray = $msg = $failmsg = $message = "";
 // """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 //  ND STUDENTS FUNCTIONALITIES
 // """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 // extract matric_number from student data 
 $NDstudents = getStudents("ND");
 $lec_result = getLecturers();
@@ -28,14 +29,13 @@ if ($lec_result) {
     while ($row = mysqli_fetch_assoc($lec_result)) {
         $NDlecturerArray[] = $row['id'];
     }
-    // free the result set
-    // $lec_result->free();
 }
 
 
 // """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 //  HND STUDENTS FUNCTIONALITIES
 // """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 $lecturer_status = ["Chief Lecturer", "Senior Lecturer", "Lecturer 1", "Lecturer 2"];
 $HNDstudents = getStudents("HND");
 $HNDstudentsArray = array();
@@ -49,6 +49,10 @@ if ($HNDstudents) {
     // Free the result set
     $HNDstudents->free();
 }
+
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+//  More Features
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 // Setting Table names form the query 
 $lecturers = "lecturers";
@@ -68,27 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['generate'])) {
 
         // Insert the alocations into the database storage
         $message = uploadAllocations($nd_supervisor_allocations, $students, $lec, "ND");
-        
-        // // Check if the user data already exists in the database
-        // $query = "SELECT * FROM nd_supervisor_allocations WHERE supervisor_id = '$lec'";
-        // $result = mysqli_query($conn, $query);
-        // if (mysqli_num_rows($result) > 0) {
-        //     $updateQuery = "UPDATE nd_supervisor_allocations SET students = '$students' WHERE supervisor_id = '$lec'";
-        //     if (mysqli_query($conn, $updateQuery)) {
-        //         $msg = "Student allocation updated successfully";
-        //     } else {
-        //         $failmsg = "Oops, an error occur while updating student allocation";
-        //     }
-        // } else {
-            
-        //     // Insert data into the database if not exists
-        //     $sql = "INSERT INTO nd_supervisor_allocations(supervisor_id, students, programme)VALUES($lec, '$students', 'ND')";
-        //     if (mysqli_query($conn, $sql)) {
-        //         $msg = "Student allocation successfully generated!";
-        //     } else {
-        //         $failmsg = "Oops, an error occured while generating allocation";
-        //     }
-        // }
     }
     
 }

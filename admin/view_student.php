@@ -2,7 +2,7 @@
 require_once './includes/header.php'; 
 require_once './includes/functions.php';
 
-$students = getStudents()
+$students = getAllStudents()
 ?>
 <!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
@@ -129,11 +129,12 @@ $students = getStudents()
                         <thead>
                             <tr>
                                 <th style="width: 10px;">#</th>
-                                <th style="width: auto;">Matric Number</th>
+                                <th>Matric Number</th>
                                 <th>Full Name</th>
-                                <th>Email</th>
-                                <th style="width: 30px;">Edit</th>
-                                <th style="width: 50px;">Delete</th>
+                                <th style="width: 280px;">Email</th>
+                                <th style="width: 100px;">Programme</th>
+                                <th style="width: 40px;">Edit</th>
+                                <th>Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,8 +145,9 @@ $students = getStudents()
                                 <td>'.$student['matric_number'].'</td>
                                 <td>'.$student['fullname'].'</td>
                                 <td>'.$student['email'].'</td>
-                                <td><a class="btn btn-outline-primary" href="departmemt.php?edit='.$student['id'].'">Edit</a></td>
-                                <td><a class="btn btn-outline-danger" href="departmemt.php?delete='.$student['id'].'">Delete</a></td>
+                                <td>'.$student['programme'].'</td>
+                                <td><a class="btn disabled btn-outline-primary" href="departmemt.php?edit='.$student['id'].'">Edit</a></td>
+                                <td><a class="btn disabled btn-outline-danger" href="departmemt.php?delete='.$student['id'].'">Delete</a></td>
                             </tr>';
                             }
                                 
