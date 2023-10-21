@@ -133,7 +133,7 @@ $lecturers = getLecturers();
                                 <th>Lecturer Code</th>
                                 <th>Lecturer Status</th>
                                 <th style="width: 30px;">Edit</th>
-                                <th style="width: 50px;">Delete</th>
+                                <th>Delete</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,8 +144,8 @@ $lecturers = getLecturers();
                                 <td>'.$lecturer['lecturer_name'].'</td>
                                 <td>'.$lecturer['lecturer_code'].'</td>
                                 <td>'.$lecturer['lec_status'].'</td>
-                                <td><a class="btn btn-outline-primary" href="departmemt.php?edit='.$lecturer['id'].'">Edit</a></td>
-                                <td><a class="btn btn-outline-danger" href="departmemt.php?delete='.$lecturer['id'].'">Delete</a></td>
+                                <td><a class="btn disabled btn-outline-primary" href="departmemt.php?edit='.$lecturer['id'].'">Edit</a></td>
+                                <td><a class="btn disabled btn-outline-danger" href="departmemt.php?delete='.$lecturer['id'].'">Delete</a></td>
                             </tr>';
                             }
                                 

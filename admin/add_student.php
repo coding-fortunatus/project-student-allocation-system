@@ -2,17 +2,23 @@
 require_once './includes/header.php';
 require_once './includes/functions.php';
 
-$password = "123456789";
-$password = password_hash($password, PASSWORD_DEFAULT);
+// $password = "123456789";
+// $password = password_hash($password, PASSWORD_DEFAULT);
 
-$mat_number_error = $fullname_error = $email_error = $single_student_error = $file_error = "";
-$mat_number = $fullname = $email = $single_success = $file_success = "";
+$mat_number_error = $fullname_error = $email_error = $single_student_error = $file_error = $programme_type_err = "";
+$mat_number = $fullname = $email = $single_success = $file_success = $programme_type = $programme_type_error = "";
 
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['single_student'])) {
     if (empty($_POST['mat_number'])) {
-        $mat_number_error = "Matric Number is required";
+        $mat_number_error = "Required";
     } else {
         $mat_number = validate_input($_POST['mat_number']);
+    }
+
+    if (empty($_POST['programme']) && $_POST['programme'] === "Choose...") {
+        $programme_type_error = "Required";
+    } else {
+        $programme_type = validate_input($_POST['programme']);
     }
 
     if (empty($_POST['fullname'])) {
@@ -35,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['single_student'])) {
         if (mysqli_num_rows($query_string) > 0) {
             $single_student_error = "Student already exists with this Matric Number";
         } else {
-            $query = "INSERT INTO students(matric_number, fullname, email, passwords)VALUES('$mat_number', '$fullname', '$email', '$password')";
+            $query = "INSERT INTO students(matric_number, fullname, email, programme)VALUES('$mat_number', '$fullname', '$email', '$programme_type')";
             if (mysqli_query($conn, $query)) {
                 $single_success = "Student successfully added";
             } else {
@@ -48,6 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['single_student'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_student'])) {
+
+    if (empty($_POST['programme_upload']) && $_POST['programme_upload'] == "Choose...") {
+        $programme_type_err = "Required";
+    } else {
+        $programme_type = validate_input($_POST['programme_upload']);
+    }
         // Allowed mime types
     $fileMimes = array(
         'text/x-comma-separated-values',
@@ -81,12 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_student'])) {
             $check = mysqli_query($conn, $query);
             $row = mysqli_fetch_assoc($check);
             if (mysqli_num_rows($check) > 0) {
-                $sql = "UPDATE students SET fullname = '$fullname', email = '$email' WHERE matric_number = '$mat_number'";
+                $sql = "UPDATE students SET fullname = '$fullname', email = '$email', programme = '$programme_type' WHERE matric_number = '$mat_number'";
                 if (mysqli_query($conn, $sql)) {
                     $file_success = "Student successfully updated";
                 }
             } else {
-                $sql = "INSERT INTO students(matric_number, fullname, email)VALUES('$mat_number', '$fullname', '$email')";
+                $sql = "INSERT INTO students(matric_number, fullname, email, programme)VALUES('$mat_number', '$fullname', '$email', '$programme_type')";
                 if (mysqli_query($conn, $sql)) {
                     $file_success = "Students successfully uploaded";
                 } else {
@@ -235,10 +247,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_student'])) {
                                     </div>
                                     <span class="text-success"><?php echo $single_success; ?></span>
                                     <span class="text-danger"><?php echo $single_student_error; ?></span>
-                                    <div class="form-group mb-3">
-                                        <label for="matnumber" class="form-label">Matric Number</label>
-                                        <input type="text" class="form-control" name="mat_number" id="matnumber">
-                                        <span class="text-danger"><?php echo $mat_number_error; ?></span>
+                                    <div class="form-group row mb-3">
+                                        <div class="col">
+                                            <label for="matnumber" class="form-label">Matric Number</label>
+                                            <input type="text" class="form-control" name="mat_number" id="matnumber">
+                                            <span class="text-danger"><?php echo $mat_number_error; ?></span>
+                                        </div>
+                                        <div class="col">
+                                            <label for="programme" class="form-label">Programme</label>
+                                            <select name="programme" id="programme" class="form-select">
+                                                <option>Choose...</option>
+                                                <option value="ND">ND</option>
+                                                <option value="HND">HND</option>
+                                            </select>
+                                            <span class="text-danger"><?php echo $programme_type_error; ?></span>
+                                        </div>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="fullname" class="form-label">Full Name</label>
@@ -272,6 +295,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_student'])) {
                                     </div>
                                     <span class="text-success"><?php echo $file_success; ?></span>
                                     <span class="text-danger"><?php echo $file_error; ?></span>
+                                    <div class="form-group mb-3 col-6">
+                                        <label for="programme" class="form-label">Choose Programme</label>
+                                        <select name="programme_upload" id="programme" class="form-select">
+                                            <option>Choose...</option>
+                                            <option value="ND">ND</option>
+                                            <option value="HND">HND</option>
+                                        </select>
+                                        <span class="text-danger"><?php echo $programme_type_err; ?></span>
+                                    </div>
                                     <div class="form-group mb-3">
                                         <label for="dptfile" class="form-label">Add Student File</label>
                                         <input type="file" class="form-control" name="students" id="dptfile">

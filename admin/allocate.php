@@ -1,97 +1,104 @@
 <?php 
 require_once './includes/header.php'; 
+require_once './includes/functions.php';
 global $conn;
 
-$lecturerArray = $studentsArray = $msg = $failmsg ="";
-// Query to retrieve the content of the specified column
+$lecturerArray = $studentsArray = $msg = $failmsg = $message = "";
+
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+//  ND STUDENTS FUNCTIONALITIES
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 // extract matric_number from student data 
-$query = "SELECT matric_number FROM students";
-$result = mysqli_query($conn, $query);
-// Extract necessary datas from the lecturer data
-$lec_query = "SELECT * FROM lecturers";
-$lec_result = mysqli_query($conn, $lec_query);
-// Initialize an array to store the column values
-$studentsArray = array();
-$lecturerArray = array();
-// Create allocation array for the student lecturer allocation
-$lecturerAllocationArray = array();
-$lecturerAllocation = array();
-// Check if the query to fetch matric number was successful
-if ($result) {
+$NDstudents = getStudents("ND");
+$lec_result = getLecturers();
+$NDstudentsArray = array();
+$NDlecturerArray = array();
+// Check if the query to fetch ND student matric number was successful
+if ($NDstudents) {
     // Fetch each row and store the column value in an array
-    while ($row = mysqli_fetch_assoc($result)) {
-        $studentsArray[] = $row['matric_number'];
+    while ($row = mysqli_fetch_assoc($NDstudents)) {
+        $NDstudentsArray[] = $row['matric_number'];
     }
     // Free the result set
-    $result->free();
+    $NDstudents->free();
 }
-// Check if the query to fetch matric number was sucssessful
+// Check if the query to fetch all lecturers was sucssessful
 if ($lec_result) {
     // fetch each row and store the column value in an array
     while ($row = mysqli_fetch_assoc($lec_result)) {
-        $lecturerArray[] = $row['id'];
+        $NDlecturerArray[] = $row['id'];
     }
     // free the result set
-    $lec_result->free();
+    // $lec_result->free();
 }
+
+
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+//  HND STUDENTS FUNCTIONALITIES
+// """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+$lecturer_status = ["Chief Lecturer", "Senior Lecturer", "Lecturer 1", "Lecturer 2"];
+$HNDstudents = getStudents("HND");
+$HNDstudentsArray = array();
+$HNDlecturerArray = HndSupervisors($lecturer_status, $lec_result);
+// Check if the query to fetch HND student matric number was successful
+if ($HNDstudents) {
+    // Fetch each row and store the column value in an array
+    while ($row = mysqli_fetch_assoc($HNDstudents)) {
+        $HNDstudentsArray[] = $row['matric_number'];
+    }
+    // Free the result set
+    $HNDstudents->free();
+}
+
+// Setting Table names form the query 
+$lecturers = "lecturers";
+$nd_supervisor_allocations = "nd_supervisor_allocations";
+$hnd_supervisor_allocations = "hnd_supervisor_allocations";
+
 // Start the allocation procedures by checking for button clicked action
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['generate'])) {
-    // Create the allocation techniques
-    $number_of_students = count($studentsArray);
-    $number_of_lecturers = count($lecturerArray);
-    $studentsPerLecturer = floor(count($studentsArray) / count($lecturerArray));
-    $remainingStudents = (count($studentsArray) % count($lecturerArray));
-    shuffle($studentsArray);
-    $lecturerAllocationArray = array();
-    foreach($lecturerArray as $lecturer) {
-        $allocatedStudents = array_splice($studentsArray, 0, $studentsPerLecturer);
-        // Store the allocation as associative array
-        $allocationSubArray = array(
-            "Lecturer" => $lecturer,
-            "Students" => $allocatedStudents
-        );
-        // Store all the data into another array
-        $lecturerAllocationArray[] = $allocationSubArray;
-        // $additionalStudents = array_splice($studentsArray, 0, 1);
-        // $allocatedStudents = array_merge($allocatedStudents, $additionalStudents);
-    }
-    // allocate the remaining students from the student array after the general allocation
-    for ($i=0; $i < $remainingStudents; $i++) { 
-        array_push($lecturerAllocationArray[$i]['Students'], $studentsArray[$i]);
-    }
+
+    // Get lecturer allocations
+    $lecturerAllocationArray = (make_allocation($NDstudentsArray, $NDlecturerArray));
+        
     // To insert the lecturer allocation into database table
     foreach ($lecturerAllocationArray as $lecturerAllocation) {
         $lec = $lecturerAllocation['Lecturer'];
         $students = implode(" ", $lecturerAllocation['Students']);
-        // Check if the user data already exists in the database
-        $query = "SELECT * FROM supervisor_allocation WHERE supervisor_id = '$lec'";
-        $result = mysqli_query($conn, $query);
-        if (mysqli_num_rows($result) > 0) {
-            $updateQuery = "UPDATE supervisor_allocation SET students = '$students' WHERE supervisor_id = '$lec'";
-            if (mysqli_query($conn, $updateQuery)) {
-                $msg = "Student allocation updated successfully";
-            } else {
-                $failmsg = "Oops, an error occur while updating student allocation";
-            }
-        } else {
-            // Insert data into the database if not exists
-            $sql = "INSERT INTO supervisor_allocation(supervisor_id, students)VALUES($lec, '$students')";
-            if (mysqli_query($conn, $sql)) {
-                $msg = "Student allocation successfully generated!";
-            } else {
-                $failmsg = "Oops, an error occured while generating allocation";
-            }
-        }
+
+        // Insert the alocations into the database storage
+        $message = uploadAllocations($nd_supervisor_allocations, $students, $lec, "ND");
+        
+        // // Check if the user data already exists in the database
+        // $query = "SELECT * FROM nd_supervisor_allocations WHERE supervisor_id = '$lec'";
+        // $result = mysqli_query($conn, $query);
+        // if (mysqli_num_rows($result) > 0) {
+        //     $updateQuery = "UPDATE nd_supervisor_allocations SET students = '$students' WHERE supervisor_id = '$lec'";
+        //     if (mysqli_query($conn, $updateQuery)) {
+        //         $msg = "Student allocation updated successfully";
+        //     } else {
+        //         $failmsg = "Oops, an error occur while updating student allocation";
+        //     }
+        // } else {
+            
+        //     // Insert data into the database if not exists
+        //     $sql = "INSERT INTO nd_supervisor_allocations(supervisor_id, students, programme)VALUES($lec, '$students', 'ND')";
+        //     if (mysqli_query($conn, $sql)) {
+        //         $msg = "Student allocation successfully generated!";
+        //     } else {
+        //         $failmsg = "Oops, an error occured while generating allocation";
+        //     }
+        // }
     }
     
 }
+
 // Fetch the allocation from the database if allocation has been done
-$query = 
-        "SELECT supervisor_allocation.id, lecturers.lecturer_name, lecturers.lecturer_code, supervisor_allocation.students
-        FROM supervisor_allocation
-        INNER JOIN lecturers ON supervisor_allocation.supervisor_id = lecturers.id";
-$results = mysqli_query($conn, $query);
+$NDallocations = getAllocations($nd_supervisor_allocations, $lecturers);
+$HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
+
 ?>
+
 <!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -206,47 +213,74 @@ $results = mysqli_query($conn, $query);
         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
             <div class="button-group">
                 <input type="submit" value="Generate Allocation" name="generate" class="btn btn-outline-primary">
-                <span class="text-success"><?php echo $msg; ?></span>
-                <span class="text-danger"><?php echo $failmsg; ?></span>
+                <span class="text-success"><?php echo $message; ?></span>
             </div>
         </form>
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
         <div class="row">
-
-            <!-- Left side columns -->
-            <div class="col-lg-12">
-                <div class="row">
-                    <table id="example" class="table table-striped" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th style="width: 60px;">Code</th>
-                                <th>Lecturer Name</th>
-                                <th>Lecturer Status</th>
-                                <th>Allocated Students</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php                            
-                            if (mysqli_num_rows($results) > 0) {
-                                while ($row = mysqli_fetch_assoc($results)) {
+            <div class="card shadow py-3">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example" class="table table-hover" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">Code</th>
+                                    <th>Lecturer Name</th>
+                                    <th>Lecturer Status</th>
+                                    <th style="width: 200px;">Allocated Students</th>
+                                    <th>Programme</th>
+                                    <th style="width: 10px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php                            
+                            if (mysqli_num_rows($NDallocations) > 0) {
+                                while ($row = mysqli_fetch_assoc($NDallocations)) {
                                     
                                     echo ' <tr>
                                     <td>'.$row['id'].'</td>
                                     <td>'.$row['lecturer_name'].'</td>
-                                    <td>'.$row['lecturer_code'].'</td>';
-                                    echo '<td>'.$row['students'].'</td>
+                                    <td>'.$row['lec_status'].'</td>
+                                    <td>'.$row['students'].'</td>
+                                    <td>'.$row['programme'].'</td>
+                                    <td></td>
                                     </tr>';
                                 }
                             }
                             ?>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <!-- End Left side columns -->
         </div>
     </section>
 </main><!-- End #main -->
+<script>
+$(document).ready(function() {
+    $('#example')
+        .DataTable({
+            //disable sorting on last column      
+            "columnDefs": [{
+                "orderable": false,
+                "targets": 5
+            }],
+            language: {
+                //customize pagination prev and next buttons: use arrows instead of words        
+                'paginate': {
+                    'previous': '<span class="fa fa-chevron-left"></span>',
+                    'next': '<span class="fa fa-chevron-right"></span>'
+                },
+                //customize number of elements to be displayed        
+                "lengthMenu": 'Display <select class="form-control input-sm">' +
+                    '<option value="10">10</option>' + '<option value="20">20</option>' +
+                    '<option value="30">30</option>' + '<option value="40">40</option>' +
+                    '<option value="50">50</option>' + '<option value="-1">All</option>' +
+                    '</select> results'
+            }
+        })
+});
+</script>
 <?php require_once './includes/footer.php'; ?>

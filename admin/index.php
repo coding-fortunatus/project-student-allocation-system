@@ -3,7 +3,8 @@ require_once './includes/header.php';
 require_once './includes/functions.php';
 
 $lecturer_count = mysqli_num_rows(getLecturers());
-$Student_count = mysqli_num_rows(getStudents());
+$NDStudent_count = mysqli_num_rows(getStudents("ND"));
+$HNDStudent_count = mysqli_num_rows(getStudents("HND"));
 ?>
 
 <!-- ======= Header ======= -->
@@ -35,7 +36,7 @@ $Student_count = mysqli_num_rows(getStudents());
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li>
+                    <li class="align-items-center">
                         <a class="dropdown-item d-flex align-items-center" href="./includes/logout.php">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
@@ -127,7 +128,7 @@ $Student_count = mysqli_num_rows(getStudents());
                 <div class="row">
 
                     <!-- Lecturer Card -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card info-card revenue-card">
                             <div class="card-body">
                                 <h5 class="card-title">Lecturer <span>| Total</span></h5>
@@ -147,10 +148,10 @@ $Student_count = mysqli_num_rows(getStudents());
                     </div><!-- End Lecturer Card -->
 
                     <!-- Student Card -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="card info-card revenue-card">
                             <div class="card-body">
-                                <h5 class="card-title">Student <span>| Total</span></h5>
+                                <h5 class="card-title">ND Student <span>| Total</span></h5>
 
                                 <div class="d-flex align-items-center">
                                     <div
@@ -158,7 +159,26 @@ $Student_count = mysqli_num_rows(getStudents());
                                         <i class="text-secondary bi bi-people"></i>
                                     </div>
                                     <div class="ps-3">
-                                        <h6><?php echo $Student_count; ?></h6>
+                                        <h6><?php echo $NDStudent_count; ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- End Student Card -->
+
+                    <!-- Student Card -->
+                    <div class="col-md-4">
+                        <div class="card info-card revenue-card">
+                            <div class="card-body">
+                                <h5 class="card-title">HND Student <span>| Total</span></h5>
+
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="text-secondary bi bi-people"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6><?php echo $HNDStudent_count; ?></h6>
                                     </div>
                                 </div>
                             </div>
