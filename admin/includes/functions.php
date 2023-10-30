@@ -104,8 +104,8 @@
         }
         
     }
+    
     function download_Allocation($programme, $allocationtable, $lecturertable) {
-        global $conn;
 
         // Setting filename
         $filename = $programme.'-Allocation.xlsx';

@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['generate'])) {
     
 }
 
+// Check for download button triggers and download the student allocations
 if (isset($_POST['download']) && $_POST['programme'] == "ND") {
     download_Allocation($_POST['programme'], $nd_supervisor_allocations, $lecturers);
 } elseif (isset($_POST['download']) && $_POST['programme'] == "HND") {
@@ -221,7 +222,7 @@ $HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
                 </div>
                 <div class="col">
                     <select name="programme" id="prog" class="form-select">
-                        <option>Filter</option>
+                        <option>All</option>
                         <option value="ND">ND</option>
                         <option value="HND">HND</option>
                     </select>
@@ -250,10 +251,10 @@ $HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
                                     echo '
                                     <thead>
                                         <tr>
-                                            <th style="width: 50px;">Code</th>
+                                            <th style="width: 70px;">Code</th>
                                             <th>Lecturer Name</th>
                                             <th>Lecturer Status</th>
-                                            <th style="width: 200px;">Allocated Students</th>
+                                            <th style="width: 300px;">Allocated Students</th>
                                             <th>Programme</th>
                                             <th style="width: 10px;"></th>
                                         </tr>
@@ -277,10 +278,10 @@ $HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
                                     echo '
                                     <thead>
                                         <tr>
-                                            <th style="width: 50px;">Code</th>
+                                            <th style="width: 70px;">Code</th>
                                             <th>Lecturer Name</th>
                                             <th>Lecturer Status</th>
-                                            <th style="width: 200px;">Allocated Students</th>
+                                            <th style="width: 300px;">Allocated Students</th>
                                             <th>Programme</th>
                                             <th style="width: 10px;"></th>
                                         </tr>
@@ -301,7 +302,45 @@ $HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
                                         }
                                     echo '</tbody>';
                                 } else {
-                                    # code...
+                                    echo '
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 70px;">Code</th>
+                                            <th>Lecturer Name</th>
+                                            <th>Lecturer Status</th>
+                                            <th style="width: 300px;">Allocated Students</th>
+                                            <th>Programme</th>
+                                            <th style="width: 10px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';                           
+                                        if (mysqli_num_rows($HNDallocations) > 0) {
+                                            while ($row = mysqli_fetch_assoc($HNDallocations)) {
+                                                
+                                                echo ' <tr>
+                                                <td>'.$row['id'].'</td>
+                                                <td>'.$row['lecturer_name'].'</td>
+                                                <td>'.$row['lec_status'].'</td>
+                                                <td>'.$row['students'].'</td>
+                                                <td>'.$row['programme'].'</td>
+                                                <td></td>
+                                                </tr>';
+                                            }
+                                        }
+                                        if (mysqli_num_rows($NDallocations) > 0) {
+                                            while ($row = mysqli_fetch_assoc($NDallocations)) {
+                                                
+                                                echo ' <tr>
+                                                <td>'.$row['id'].'</td>
+                                                <td>'.$row['lecturer_name'].'</td>
+                                                <td>'.$row['lec_status'].'</td>
+                                                <td>'.$row['students'].'</td>
+                                                <td>'.$row['programme'].'</td>
+                                                <td></td>
+                                                </tr>';
+                                            }
+                                        }
+                                echo '</tbody>';
                                 }
                             ?>
                         </table>
