@@ -1,7 +1,14 @@
 <?php 
+session_start();
 require_once './includes/header.php'; 
 require_once './includes/functions.php';
 global $conn;
+
+// Check if the user is already logged in, if yes then redirect him to welcome page
+if(!isset($_SESSION["loggin"]) && !$_SESSION["loggin"] === true){
+    header("location: login.php");
+    exit;
+}
 
 $lecturerArray = $studentsArray = $msg = $failmsg = $message = "";
 
@@ -125,7 +132,7 @@ $HNDallocations = getAllocations($hnd_supervisor_allocations, $lecturers);
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>Administrator</h6>
-                        <span>Project Cordinator</span>
+                        <span><?php echo $_SESSION['username'] ?></span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">

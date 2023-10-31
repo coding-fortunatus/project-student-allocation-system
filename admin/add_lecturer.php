@@ -1,8 +1,14 @@
 <?php
 require_once "./includes/dbh.php";
 require_once "./includes/functions.php";
-$password = "12346789";
-$password = password_hash($password, PASSWORD_DEFAULT);
+// $password = "12346789";
+// $password = password_hash($password, PASSWORD_DEFAULT);
+
+// Check if the user is already logged in, if yes then redirect him to welcome page
+if(!isset($_SESSION["loggin"]) && !$_SESSION["loggin"] === true){
+    header("location: login.php");
+    exit;
+}
 
 $lecturer_name = $lecturer_code = $status = $single_success = $file_success = "";
 $lecturer_name_error = $lecturer_code_error = $status_error = $file_error = $single_lect_error = "";
@@ -31,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['single_lecturer'])) {
         if (mysqli_num_rows($query_string) > 0) {
             $single_lect_error = "Lecturer already exists";
         } else {
-            $query = "INSERT INTO lecturers(lecturer_name, lecturer_code, lec_status, passwords)VALUES('$lecturer_name', '$lecturer_code', '$status', '$password')";
+            $query = "INSERT INTO lecturers(lecturer_name, lecturer_code, lec_status)VALUES('$lecturer_name', '$lecturer_code', '$status')";
             if (mysqli_query($conn, $query)) {
                 $single_success = "Lecturer successfully added";
             } else {
@@ -125,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_lecturer'])) {
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>Administrator</h6>
-                        <span>Project Cordinator</span>
+                        <span><?php echo $_SESSION['username'] ?></span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">

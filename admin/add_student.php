@@ -1,9 +1,13 @@
 <?php 
+session_start();
 require_once './includes/header.php';
 require_once './includes/functions.php';
 
-// $password = "123456789";
-// $password = password_hash($password, PASSWORD_DEFAULT);
+// Check if the user is already logged in, if yes then redirect him to welcome page
+if(!isset($_SESSION["loggin"]) && !$_SESSION["loggin"] === true){
+    header("location: login.php");
+    exit;
+}
 
 $mat_number_error = $fullname_error = $email_error = $single_student_error = $file_error = $programme_type_err = "";
 $mat_number = $fullname = $email = $single_success = $file_success = $programme_type = $programme_type_error = "";
@@ -139,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['upload_student'])) {
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                     <li class="dropdown-header">
                         <h6>Administrator</h6>
-                        <span>Project Cordinator</span>
+                        <span><?php echo $_SESSION['username'] ?></span>
                     </li>
                     <li>
                         <hr class="dropdown-divider">

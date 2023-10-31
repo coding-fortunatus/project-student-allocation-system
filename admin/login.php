@@ -6,6 +6,10 @@ if(isset($_SESSION["loggin"]) && $_SESSION["loggin"] === true){
     exit;
 }
 
+// $password = "admin";
+// $password = password_hash($password, PASSWORD_DEFAULT);
+// echo $password;
+
 require_once "includes/dbh.php";
 
 $username = $password = "";
@@ -40,14 +44,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])){
                 // Check if username exists, if yes then verify password
                 if(mysqli_stmt_num_rows($stmt) == 1){                    
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $username, $hashed_password);
+                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $user_role);
                     if(mysqli_stmt_fetch($stmt)){
                         if(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
                             session_start();
                             // Store data in session variables
                             $_SESSION["loggin"] = true;
-                            $_SESSION["username"] = $username;                            
+                            $_SESSION["username"] = $username;
+                            $_SESSION['id'] = $id;                        
                             
                             // Redirect user to welcome page
                             header("location: index.php");
